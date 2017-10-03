@@ -4,7 +4,7 @@
   "description": "A thumbnail generating server for RedditBooru",
   "main": "index.js",
   "scripts": {
-    "start": "ts-node index.ts",
+    "start": "node index",
     "test": "mocha tests/"
   },
   "author": "Matt Hackmann",
