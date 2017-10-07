@@ -39,9 +39,6 @@ describe('image-fetcher', () => {
       .reply(ERROR_CODE);
 
     return fetch(IMAGE_URL)
-      .then(() => {
-        throw new Error('this is not the error you are looking for');
-      })
       .catch(err => {
         expect(err.message).to.contain(ERROR_CODE);
         nockResponse.done();
@@ -55,9 +52,6 @@ describe('image-fetcher', () => {
       .replyWithError(new Error(FAILURE_MSG));
 
     return fetch(IMAGE_URL)
-      .then(() => {
-        throw new Error('I am here, therefore I fail');
-      })
       .catch(err => {
         expect(err.message).to.contain(FAILURE_MSG);
         nockResponse.done();
