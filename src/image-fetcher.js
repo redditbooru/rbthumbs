@@ -4,6 +4,12 @@ const fs = require('fs');
 const request = require('request');
 const nodeUrl = require('url');
 
+/**
+ * Async wrapper for request
+ *
+ * @param {*} options
+ * @return {Promise} A promise that resolves to a buffer of the request body
+ */
 function requestAsync(options) {
   return new Promise((resolve, reject) => {
     request(options, (err, res, body) => {
@@ -18,6 +24,12 @@ function requestAsync(options) {
   });
 }
 
+/**
+ * Downloads an image, doing host resolultion and "hot-link evasion"
+ *
+ * @param {string} url The image URL to fetch.
+ * @return {Promise} A promise that resolves to a buffer of the image data
+ */
 module.exports = function fetch(url) {
   return hostImageResolver(url)
     .then(urls => requestAsync({

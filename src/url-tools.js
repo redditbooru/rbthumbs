@@ -1,8 +1,11 @@
+// Map (really, a list tuples) of characters to replace in
+// encoded URLs
 const ENCODING_MAP = [
   [ '=', '-' ],
   [ '/', '_' ]
 ];
 
+// URL format: BASE64-ENCODED_STRING-_WIDTH_HEIGHT
 const URL_REGEX = /([\w\-\\_\+]+)_([\d]+)_([\d]+)/g;
 
 module.exports = {

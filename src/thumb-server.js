@@ -9,14 +9,28 @@ const crop = require('./image-cropper');
 const { decodeUrl, encodeUrl } = require('./url-tools');
 
 module.exports = class ThumbServer {
+  /**
+   * Returns whether the HTTP server is running
+   *
+   * @return {boolean}
+   */
   get isRunning() {
     return this._started;
   }
 
+  /**
+   * Constructor
+   *
+   * @param {number} options.port The port to bind the HTTP server to
+   * @param {function} options.unhandledRequest A callback to handle non-thumbnail requests
+   * @param {function} options.requestFailed A callback to handle any request failure
+   * @param {string} options.imageStoragePath The path to save generated thumbnails
+   */
   constructor(options = {}) {
     this.app = express();
     this.server = http.createServer(this.app);
 
+    // I should rewrite all this in TypeScript...
     if (typeof options.port !== 'number') {
       throw new Error('Port number is required and must be a number');
     }
