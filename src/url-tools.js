@@ -19,12 +19,12 @@ module.exports = {
     ENCODING_MAP.forEach(([ base64Char, urlChar ]) => {
       encodedUrl = encodedUrl.replace(new RegExp(base64Char, 'g'), urlChar);
     });
-    return `${encodedUrl}_${width}_${height}`
+    return `${encodedUrl}_${width}_${height}`;
   },
 
   /**
    * Decodes a URL into its various parts
-   * @param {*} url The URL to decode
+   * @param {string} url The URL to decode
    * @return {Object} An object containing the image URL, width, and height of the thumbnail
    */
   decodeUrl(url) {

@@ -1,0 +1,1 @@
+const ThumbServer = require('../src/thumb-server');
