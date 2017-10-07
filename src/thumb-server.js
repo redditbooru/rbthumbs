@@ -2,6 +2,7 @@ const bluebird = require('bluebird');
 const express = require('express');
 const http = require('http');
 const path = require('path');
+const url = require('url');
 const writeFileAsync = bluebird.promisify(require('fs').writeFile);
 
 const fetch = require('./image-fetcher');
@@ -27,9 +28,6 @@ module.exports = class ThumbServer {
    * @param {string} options.imageStoragePath The path to save generated thumbnails
    */
   constructor(options = {}) {
-    this.app = express();
-    this.server = http.createServer(this.app);
-
     // I should rewrite all this in TypeScript...
     if (typeof options.port !== 'number') {
       throw new Error('Port number is required and must be a number');
@@ -53,6 +51,10 @@ module.exports = class ThumbServer {
 
     this._started = false;
     this._handleThumbnailRequest = this._handleThumbnailRequest.bind(this);
+
+    this.app = express();
+    this.server = http.createServer(this.app);
+    this._setupRoutes();
   }
 
   /**
@@ -63,7 +65,6 @@ module.exports = class ThumbServer {
   start() {
     return new Promise((resolve, reject) => {
       if (!this._started) {
-        this._setupRoutes();
         this.server.listen(this.port, err => {
           if (!err) {
             this._started = true;
@@ -84,7 +85,7 @@ module.exports = class ThumbServer {
    */
   stop() {
     if (this._started) {
-      this.server.stop();
+      this.server.close();
       this._started = false;
     }
   }
@@ -112,6 +113,7 @@ module.exports = class ThumbServer {
    */
   _handleThumbnailRequest(req, res) {
     let decodedUrl;
+
     try {
       decodedUrl = decodeUrl(req.originalUrl);
 
@@ -122,13 +124,20 @@ module.exports = class ThumbServer {
     }
 
     // Generate the thumbnail then save and send it
-    const { url, width, height } = decodedUrl;
-    fetch(url)
+    const { url: imageUrl, width, height } = decodedUrl;
+
+    // Verify the image URL is indeed a URL
+    if (!url.parse(imageUrl).hostname) {
+      this.requestFailed(req, res);
+      return;
+    }
+
+    fetch(imageUrl)
       .then(buffer => crop(buffer, width, height))
       .then(buffer => Promise.all([
         res.type('jpeg').send(buffer),
-        writeFileAsync(path.join(this.imageStoragePath, `${encodeUrl(url, width, height)}.jpg`), buffer)
+        writeFileAsync(path.join(this.imageStoragePath, `${encodeUrl(imageUrl, width, height)}.jpg`), buffer)
       ]))
-      .catch(this.requestFailed);
+      .catch(() => this.requestFailed(req, res));
   }
 }
