@@ -3,6 +3,7 @@ const expect = require('expect.js');
 const fs = bluebird.promisifyAll(require('fs'));
 const imagick = bluebird.promisifyAll(require('imagemagick'));
 const nock = require('nock');
+const os = require('os');
 const path = require('path');
 const request = require('supertest');
 const sinon = require('sinon');
@@ -109,8 +110,9 @@ describe('thumb-server', () => {
   });
 
   it('should return a cropped thumbnail for a valid URL and save the file to disk', () => {
+    const IMG_DIR = os.tmpdir();
     const server = new ThumbServer(Object.assign({}, TEST_CONFIG, {
-      imageStoragePath: __dirname
+      imageStoragePath: IMG_DIR
     }));
 
     let responseBuffer;
@@ -131,7 +133,7 @@ describe('thumb-server', () => {
         expect(results.width).to.be(THUMBNAIL_WIDTH);
         expect(results.height).to.be(THUMBNAIL_HEIGHT);
       })
-      .then(() => fs.readFileAsync(path.join(__dirname, THUMBNAIL_URL)))
+      .then(() => fs.readFileAsync(path.join(IMG_DIR, THUMBNAIL_URL)))
       .then(buffer => {
         expect(buffer).to.eql(responseBuffer);
       });
