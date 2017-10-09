@@ -1,14 +1,22 @@
 const bluebird = require('bluebird');
+const program = require('commander');
 const readFileAsync = bluebird.promisify(require('fs').readFile);
 const path = require('path');
 
 const ThumbServer = require('./src/thumb-server');
 
+program
+  .version(require('./package').version)
+  .option('-p, --port <n>', 'Port', parseInt)
+  .parse(process.argv);
+
+const port = program.port || 4000;
+
 const server = new ThumbServer({
-  port: 4000,
+  port,
+  imageStoragePath: path.join(__dirname, 'cache'),
   unhandledRequest: res => res.type('png').send(notFoundBuffer),
-  requestFailed: res => res.type('png').send(brokenBuffer),
-  imageStoragePath: path.join(__dirname, 'cache')
+  requestFailed: res => res.type('png').send(brokenBuffer)
 });
 
 let brokenBuffer;
@@ -25,4 +33,7 @@ Promise.all([
   .then(() => server.start())
   .then(() => {
     console.log(`Server running on port ${server.port}`);
+  })
+  .catch(err => {
+    console.error(err);
   });
