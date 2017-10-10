@@ -80,13 +80,27 @@ describe('thumb-server', () => {
   });
 
   it('should reject with the error if the server failed to start', () => {
-    // Override the port to an invalid one
-    server = new ThumbServer(Object.assign({}, TEST_CONFIG, { port: 19860608 }));
+    const ERR_MSG = 'Oh noooo!';
+    server = new ThumbServer(TEST_CONFIG);
+    sandbox.stub(server.server, 'listen').callsFake((port, cb) => {
+      cb(ERR_MSG);
+    });
+
     return server.start()
       .catch(err => {
-        expect(err).to.be.an(Error);
+        expect(err).to.be(ERR_MSG);
         expect(server.isRunning).to.not.be.ok();
       });
+  });
+
+  it('should reject with a bad URL', () => {
+    // Generally speaking, I don't like testing private methods. However,
+    // decodeUrl _can_ throw an error and the easiest way to test that
+    // this error gets caught correctly is to invoke the callback directly.
+    server = new ThumbServer(TEST_CONFIG);
+    const requestFailedSpy = sandbox.spy(server, 'requestFailed');
+    server._handleThumbnailRequest({ originalUrl: 'this is no thumbnail URL...' });
+    expect(requestFailedSpy.calledOnce).to.be.ok();
   });
 
   it('should call unhandledRequest for a non-thumbnail request', done => {
