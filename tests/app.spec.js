@@ -93,8 +93,8 @@ describe('thumb-server', () => {
 
   it('should log out any startup errors and rethrow them', () => {
     const app = new App(DEFAULT_PORT);
-    const startStub = sandbox.stub(app.server, 'start').throws();
     const consoleSpy = sandbox.spy(console, 'error');
+    sandbox.stub(app.server, 'start').throws();
 
     return app.start().catch(err => {
       expect(consoleSpy.calledOnce).to.be.ok();
