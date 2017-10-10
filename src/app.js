@@ -4,13 +4,25 @@ const path = require('path');
 
 const ThumbServer = require('./thumb-server');
 
+let brokenBuffer;
+let notFoundBuffer;
+
+function isNumeric(num) {
+  return num - 0 == num;
+}
+
 module.exports = class App {
   constructor(port) {
+    // Port is required
+    if (!isNumeric(port)) {
+      throw new Error('Port number is required and must be a number');
+    }
+
     this.server = new ThumbServer({
       port,
       imageStoragePath: path.join(__dirname, 'cache'),
-      unhandledRequest: res => res.type('png').send(this.notFoundBuffer),
-      requestFailed: res => res.type('png').send(this.brokenBuffer)
+      unhandledRequest: this._unhandledRequest.bind(this),
+      requestFailed: this._requestFailed.bind(this)
     });
   }
 
@@ -20,16 +32,25 @@ module.exports = class App {
       readFileAsync(path.join(__dirname, '..', 'static', 'broken.png'))
     ])
       .then(( [ notFoundPngBuffer, brokenPngBuffer ] ) => {
-        this.brokenBuffer = brokenPngBuffer;
-        this.notFoundBuffer = notFoundPngBuffer;
+        brokenBuffer = brokenPngBuffer;
+        notFoundBuffer = notFoundPngBuffer;
       })
       .then(() => this.server.start())
       .then(() => {
         console.log(`Server running on port ${this.server.port}`);
       })
       .catch(err => {
-        console.error(err);
+        console.error(err.toString());
+        throw err;
       });
+  }
+
+  _unhandledRequest(req, res) {
+    res.type('png').send(notFoundBuffer);
+  }
+
+  _requestFailed(req, res) {
+    res.type('png').send(brokenBuffer);
   }
 
   stop() {
