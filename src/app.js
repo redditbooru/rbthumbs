@@ -20,7 +20,7 @@ module.exports = class App {
 
     this.server = new ThumbServer({
       port,
-      imageStoragePath: path.join(__dirname, 'cache'),
+      imageStoragePath: path.join(process.cwd(), 'cache'),
       unhandledRequest: this._unhandledRequest.bind(this),
       requestFailed: this._requestFailed.bind(this)
     });
@@ -28,8 +28,8 @@ module.exports = class App {
 
   start() {
     return Promise.all([
-      readFileAsync(path.join(__dirname, '..', 'static', 'not-found.png')),
-      readFileAsync(path.join(__dirname, '..', 'static', 'broken.png'))
+      readFileAsync(path.join(process.cwd(), 'static', 'not-found.png')),
+      readFileAsync(path.join(process.cwd(), 'static', 'broken.png'))
     ])
       .then(( [ notFoundPngBuffer, brokenPngBuffer ] ) => {
         brokenBuffer = brokenPngBuffer;
