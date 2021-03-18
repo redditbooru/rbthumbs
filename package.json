@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "node index",
-    "test": "nyc mocha tests/",
+    "test": "mocha -r esm tests/",
     "coverage": "nyc report --reporter=text-lcov | coveralls"
   },
   "author": "Matt Hackmann",
@@ -28,6 +28,7 @@
     "@types/request": "^2.0.3",
     "@types/tmp": "0.0.33",
     "coveralls": "^3.0.0",
+    "esm": "^3.2.25",
     "expect.js": "^0.3.1",
     "mocha": "^4.0.0",
     "nock": "^9.0.22",

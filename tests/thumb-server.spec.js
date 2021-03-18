@@ -8,7 +8,7 @@ const path = require('path');
 const request = require('supertest');
 const sinon = require('sinon');
 
-const ThumbServer = require('../src/thumb-server');
+import ThumbServer from '../src/thumb-server';
 
 const IMAGE_BASE64 = 'aHR0cDovL2R4cHJvZy5jb20vY29vbC1waWN0dXJlLmpwZw--';
 const IMAGE_HOST = 'http://dxprog.com';
@@ -130,6 +130,7 @@ describe('thumb-server', () => {
     }));
 
     let responseBuffer;
+    let nockResponse;
     return fs.readFileAsync(path.join(__dirname, 'images', 'taiga.jpg'))
       .then(buffer => nockResponse = nock(IMAGE_HOST).get(IMAGE_NAME).reply(200, buffer))
       .then(() => {
@@ -156,9 +157,10 @@ describe('thumb-server', () => {
   it('should call requestFailed on a bad thumbnail URL', done => {
     const RESPONSE = 'Hi';
     const requestFailedSpy = sandbox.spy((req, res) => res.send(RESPONSE));
-    server = new ThumbServer(Object.assign({}, TEST_CONFIG, {
+    server = new ThumbServer({
+      ...TEST_CONFIG,
       requestFailed: requestFailedSpy
-    }));
+    });
 
     request(server.app)
       .get('/blahdbldhjfid_150_150.jpg')
@@ -176,10 +178,11 @@ describe('thumb-server', () => {
   it('should call requestFailed on a failed image request', () => {
     const RESPONSE = 'Hi';
     const requestFailedSpy = sandbox.spy((req, res) => res.send(RESPONSE));
-    server = new ThumbServer(Object.assign({}, TEST_CONFIG, {
+    server = new ThumbServer({
+      ...TEST_CONFIG,
       requestFailed: requestFailedSpy
-    }));
-    const nockResponse = nock(IMAGE_HOST).get(IMAGE_NAME).reply(200, Buffer.from('No image for you'));
+    });
+    const nockResponse = nock(IMAGE_HOST).get(IMAGE_NAME).reply(200, Buffer.from('No image for you', 'utf-8'));
 
     return request(server.app).get(THUMBNAIL_URL)
       .expect(200, RESPONSE)

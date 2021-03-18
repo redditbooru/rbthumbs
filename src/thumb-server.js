@@ -1,15 +1,17 @@
-const bluebird = require('bluebird');
-const express = require('express');
-const http = require('http');
-const path = require('path');
-const url = require('url');
-const writeFileAsync = bluebird.promisify(require('fs').writeFile);
+import bluebird from 'bluebird';
+import express from 'express';
+import http from 'http';
+import path from 'path';
+import url from 'url';
+import { writeFile } from 'fs';
 
-const fetch = require('./image-fetcher');
-const crop = require('./image-cropper');
-const { decodeUrl, encodeUrl } = require('./url-tools');
+import fetch from './image-fetcher';
+import crop from './image-cropper';
+import { decodeUrl, encodeUrl } from './url-tools';
 
-module.exports = class ThumbServer {
+const writeFileAsync = bluebird.promisify(writeFile);
+
+export default class ThumbServer {
   /**
    * Returns whether the HTTP server is running
    *
@@ -62,7 +64,7 @@ module.exports = class ThumbServer {
    *
    * @return {Promise} Resolve once the server has started
    */
-  start() {
+  async start() {
     return new Promise((resolve, reject) => {
       if (!this._started) {
         this.server.listen(this.port, err => {
@@ -111,7 +113,7 @@ module.exports = class ThumbServer {
    * @param {express.Request} req
    * @param {express.Response} res
    */
-  _handleThumbnailRequest(req, res) {
+  async _handleThumbnailRequest(req, res) {
     let decodedUrl;
 
     try {
@@ -132,12 +134,15 @@ module.exports = class ThumbServer {
       return;
     }
 
-    fetch(imageUrl)
-      .then(buffer => crop(buffer, width, height))
-      .then(buffer => Promise.all([
-        res.type('jpeg').send(buffer),
-        writeFileAsync(path.join(this.imageStoragePath, `${encodeUrl(imageUrl, width, height)}.jpg`), buffer)
-      ]))
-      .catch(() => this.requestFailed(req, res));
+    try {
+      const fetchBuffer = await fetch(imageUrl);
+      const cropBuffer = await crop(fetchBuffer, width, height);
+      await Promise.all([
+        res.type('jpeg').send(cropBuffer),
+        writeFileAsync(path.join(this.imageStoragePath, `${encodeUrl(imageUrl, width, height)}.jpg`), cropBuffer)
+      ]);
+    } catch (err) {
+      this.requestFailed(req, res)
+    }
   }
 }

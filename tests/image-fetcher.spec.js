@@ -4,7 +4,7 @@ const fs = bluebird.promisifyAll(require('fs'));
 const nock = require('nock');
 const path = require('path');
 
-const fetch = require('../src/image-fetcher');
+import fetch from '../src/image-fetcher';
 
 const IMAGE_HOST = 'http://cdn.awwni.me';
 const IMAGE_PATH = '/taiga.jpg';

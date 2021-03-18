@@ -1,8 +1,10 @@
-const bluebird = require('bluebird');
-const readFileAsync = bluebird.promisify(require('fs').readFile);
-const path = require('path');
+import bluebird from 'bluebird';
+import { readFile } from 'fs';
+import path from 'path';
 
-const ThumbServer = require('./thumb-server');
+import ThumbServer from './thumb-server';
+
+const readFileAsync = bluebird.promisify(readFile);
 
 let brokenBuffer;
 let notFoundBuffer;
@@ -11,7 +13,7 @@ function isNumeric(num) {
   return num - 0 == num;
 }
 
-module.exports = class App {
+export default class App {
   constructor(port) {
     // Port is required
     if (!isNumeric(port)) {
@@ -26,23 +28,22 @@ module.exports = class App {
     });
   }
 
-  start() {
-    return Promise.all([
-      readFileAsync(path.join(process.cwd(), 'static', 'not-found.png')),
-      readFileAsync(path.join(process.cwd(), 'static', 'broken.png'))
-    ])
-      .then(( [ notFoundPngBuffer, brokenPngBuffer ] ) => {
-        brokenBuffer = brokenPngBuffer;
-        notFoundBuffer = notFoundPngBuffer;
-      })
-      .then(() => this.server.start())
-      .then(() => {
-        console.log(`Server running on port ${this.server.port}`);
-      })
-      .catch(err => {
-        console.error(err.toString());
-        throw err;
-      });
+  async start() {
+    try {
+      const [ notFoundPngBuffer, brokenPngBuffer ] = await Promise.all([
+        readFileAsync(path.join(process.cwd(), 'static', 'not-found.png')),
+        readFileAsync(path.join(process.cwd(), 'static', 'broken.png'))
+      ]);
+
+      notFoundBuffer = notFoundPngBuffer;
+      brokenBuffer = brokenPngBuffer;
+
+      await this.server.start();
+      console.log(`Server running on port ${this.server.port}`);
+    } catch (err) {
+      console.error(err.toString());
+      throw err;
+    }
   }
 
   _unhandledRequest(req, res) {
@@ -56,5 +57,4 @@ module.exports = class App {
   stop() {
     this.server.stop();
   }
-
 };
