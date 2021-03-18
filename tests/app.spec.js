@@ -8,7 +8,7 @@ const path = require('path');
 const request = require('supertest');
 const sinon = require('sinon');
 
-const App = require('../src/app');
+import App from '../src/app';
 
 const IMAGE_BASE64 = 'aHR0cDovL2R4cHJvZy5jb20vY29vbC1waWN0dXJlLmpwZw--';
 const IMAGE_HOST = 'http://dxprog.com';
@@ -59,7 +59,7 @@ describe('thumb-server', () => {
 
     return request(app.server.app)
       .get('/')
-      .expect('Content-Type', 'image/png')
+      .expect('Content-Type', /image\/png/)
       .expect(200)
       .then(res => {
         expect(res.body).to.eql(notFoundImg);

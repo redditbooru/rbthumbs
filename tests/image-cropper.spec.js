@@ -4,7 +4,7 @@ const fs = bluebird.promisifyAll(require('fs'));
 const imagick = bluebird.promisifyAll(require('imagemagick'));
 const path = require('path');
 
-const crop = require('../src/image-cropper');
+import crop from '../src/image-cropper';
 
 describe('image-cropper', () => {
   it('should crop the provided image buffer', () => {

@@ -1,5 +1,4 @@
-const bluebird = require('bluebird');
-const imagick = bluebird.promisifyAll(require('imagemagick'));
+import imagick from 'imagemagick';
 
 /**
  * Crops an image
@@ -9,12 +8,24 @@ const imagick = bluebird.promisifyAll(require('imagemagick'));
  * @param {number} height The height of the cropped image
  * @return {Promise} A promise that resolves to a buffer of the cropped image
  */
-module.exports = function crop(buffer, width, height) {
-  return imagick.cropAsync({
-    srcData: buffer,
-    width,
-    height,
-    quality: 0.8,
-    gravity: 'North'
-  }).then(stdout => Buffer.from(stdout, 'binary'));
+export default async function crop(buffer, width, height) {
+  return new Promise((resolve, reject) => {
+    try {
+      imagick.crop({
+        srcData: buffer,
+        width,
+        height,
+        quality: 0.8,
+        gravity: 'North'
+      }, (err, stdout) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(Buffer.from(stdout, 'binary'));
+        }
+      });
+    } catch (err) {
+      reject(err);
+    }
+  });
 };
