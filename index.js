@@ -1,10 +1,11 @@
+import { readFile } from 'fs/promises';
 import cluster from 'cluster';
 import program from 'commander';
 import os from 'os';
 
 import App from './src/app.js';
-import pjson from './package.json';
 
+const pjson = JSON.parse(await readFile(new URL('./package.json', import.meta.url)));
 const DEFAULT_PORT = 4000;
 
 program
