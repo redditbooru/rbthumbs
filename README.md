@@ -1,5 +1,5 @@
-[![Build Status](https://travis-ci.org/dxprog/rbthumbs.svg)](https://travis-ci.org/dxprog/rbthumbs)
-[![](https://coveralls.io/repos/github/dxprog/rbthumbs/badge.svg)](https://coveralls.io/github/dxprog/rbthumbs)
+[![Build Status](https://travis-ci.org/redditbooru/rbthumbs.svg)](https://travis-ci.org/redditbooru/rbthumbs)
+[![](https://coveralls.io/repos/github/redditbooru/rbthumbs/badge.svg)](https://coveralls.io/github/redditbooru/rbthumbs)
 
 # RedditBooru Thumbnail Generator / Server
 
