@@ -2,7 +2,7 @@ import bluebird from 'bluebird';
 import { readFile } from 'fs';
 import path from 'path';
 
-import ThumbServer from './thumb-server';
+import ThumbServer from './thumb-server.js';
 
 const readFileAsync = bluebird.promisify(readFile);
 

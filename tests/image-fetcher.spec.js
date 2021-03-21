@@ -1,10 +1,13 @@
-const bluebird = require('bluebird');
-const expect = require('expect.js');
-const fs = bluebird.promisifyAll(require('fs'));
-const nock = require('nock');
-const path = require('path');
+import bluebird from 'bluebird';
+import expect from 'expect.js';
+import { readFile } from 'fs';
+import nock from 'nock';
+import path from 'path';
 
-import fetch from '../src/image-fetcher';
+import { __dirname } from './helpers.js';
+import fetch from '../src/image-fetcher.js';
+
+const readFileAsync = bluebird.promisify(readFile);
 
 const IMAGE_HOST = 'http://cdn.awwni.me';
 const IMAGE_PATH = '/taiga.jpg';
@@ -15,7 +18,7 @@ describe('image-fetcher', () => {
   it('should fetch an image and return the buffer', () => {
     let nockResponse;
     let imageBuffer;
-    return fs.readFileAsync(TEST_IMAGE_PATH)
+    return readFileAsync(TEST_IMAGE_PATH)
       .then(buffer => imageBuffer = buffer)
       .then(() => {
         nockResponse = nock(IMAGE_HOST)

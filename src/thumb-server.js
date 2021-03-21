@@ -5,9 +5,9 @@ import path from 'path';
 import url from 'url';
 import { writeFile } from 'fs';
 
-import fetch from './image-fetcher';
-import crop from './image-cropper';
-import { decodeUrl, encodeUrl } from './url-tools';
+import fetch from './image-fetcher.js';
+import crop from './image-cropper.js';
+import { decodeUrl, encodeUrl } from './url-tools.js';
 
 const writeFileAsync = bluebird.promisify(writeFile);
 

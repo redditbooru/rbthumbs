@@ -1,5 +1,5 @@
-const expect = require('expect.js');
-import { encodeUrl, decodeUrl } from '../src/url-tools';
+import expect from 'expect.js';
+import { encodeUrl, decodeUrl } from '../src/url-tools.js';
 
 const TEST_URLS = [
   [ 'aHR0cDovL2R4cHJvZy5jb20vZXhhbXBsZS11cmwtMQ--', 'http://dxprog.com/example-url-1' ],
