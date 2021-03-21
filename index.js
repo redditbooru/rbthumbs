@@ -24,7 +24,9 @@ if (cluster.isMaster) {
   }
 
   cluster.on('exit', (worker, code, signal) => {
-    console.log(`Process ${worker.pid} died`);
+    console.log(`Process ${worker.pid} died (${code})`);
+    // re-fork the node to maintain the pool of workers
+    cluster.fork();
   });
 } else {
   const app = new App(program.port || DEFAULT_PORT);
