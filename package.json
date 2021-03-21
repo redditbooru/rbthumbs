@@ -1,6 +1,6 @@
 {
   "name": "rbthumbs",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "A thumbnail generating server for RedditBooru",
   "main": "index.js",
   "scripts": {
