@@ -1,14 +1,15 @@
-const bluebird = require('bluebird');
-const expect = require('expect.js');
-const fs = bluebird.promisifyAll(require('fs'));
-const imagick = bluebird.promisifyAll(require('imagemagick'));
-const nock = require('nock');
-const os = require('os');
-const path = require('path');
-const request = require('supertest');
-const sinon = require('sinon');
+import bluebird from 'bluebird';
+import expect from 'expect.js';
+import { readFile } from 'fs';
+import nock from 'nock';
+import path from 'path';
+import request from 'supertest';
+import sinon from 'sinon';
 
-import App from '../src/app';
+import { __dirname } from './helpers.js';
+import App from '../src/app.js';
+
+const readFileAsync = bluebird.promisify(readFile);
 
 const IMAGE_BASE64 = 'aHR0cDovL2R4cHJvZy5jb20vY29vbC1waWN0dXJlLmpwZw--';
 const IMAGE_HOST = 'http://dxprog.com';
@@ -27,8 +28,8 @@ describe('thumb-server', () => {
   beforeEach(() => {
     sandbox = sinon.sandbox.create();
     return Promise.all([
-      fs.readFileAsync(path.join(__dirname, '..', 'static', 'broken.png')),
-      fs.readFileAsync(path.join(__dirname, '..', 'static', 'not-found.png'))
+      readFileAsync(path.join(__dirname, '..', 'static', 'broken.png')),
+      readFileAsync(path.join(__dirname, '..', 'static', 'not-found.png'))
     ]).then(([ brokenPng, notFoundPng ]) => {
       brokenImg = brokenPng;
       notFoundImg = notFoundPng;
