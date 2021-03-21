@@ -1,13 +1,14 @@
-const cluster = require('cluster');
-const program = require('commander');
-const os = require('os');
+import cluster from 'cluster';
+import program from 'commander';
+import os from 'os';
 
-const App = require('./src/app');
+import App from './src/app.js';
+import pjson from './package.json';
 
 const DEFAULT_PORT = 4000;
 
 program
-  .version(require('./package.json').version)
+  .version(pjson.version)
   .option('-p, --port <n>', 'Port', parseInt)
   .parse(process.argv);
 

@@ -1,10 +1,7 @@
-import bluebird from 'bluebird';
-import { readFile } from 'fs';
+import { readFile } from 'fs/promises';
 import path from 'path';
 
 import ThumbServer from './thumb-server.js';
-
-const readFileAsync = bluebird.promisify(readFile);
 
 let brokenBuffer;
 let notFoundBuffer;
@@ -31,8 +28,8 @@ export default class App {
   async start() {
     try {
       const [ notFoundPngBuffer, brokenPngBuffer ] = await Promise.all([
-        readFileAsync(path.join(process.cwd(), 'static', 'not-found.png')),
-        readFileAsync(path.join(process.cwd(), 'static', 'broken.png'))
+        readFile(path.join(process.cwd(), 'static', 'not-found.png')),
+        readFile(path.join(process.cwd(), 'static', 'broken.png'))
       ]);
 
       notFoundBuffer = notFoundPngBuffer;

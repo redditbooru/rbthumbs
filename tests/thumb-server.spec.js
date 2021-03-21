@@ -1,18 +1,13 @@
-import bluebird from 'bluebird';
 import expect from 'expect.js';
-import { readFile } from 'fs';
-import { identify } from 'imagemagick';
+import { readFile } from 'fs/promises';
 import nock from 'nock';
 import os from 'os';
 import path from 'path';
 import request from 'supertest';
 import sinon from 'sinon';
 
-import { __dirname } from './helpers.js';
+import { __dirname, identifyAsync } from './helpers.js';
 import ThumbServer from '../src/thumb-server.js';
-
-const readFileAsync = bluebird.promisify(readFile);
-const identifyAsync = bluebird.promisify(identify);
 
 const IMAGE_BASE64 = 'aHR0cDovL2R4cHJvZy5jb20vY29vbC1waWN0dXJlLmpwZw--';
 const IMAGE_HOST = 'http://dxprog.com';
@@ -135,7 +130,7 @@ describe('thumb-server', () => {
 
     let responseBuffer;
     let nockResponse;
-    return readFileAsync(path.join(__dirname, 'images', 'taiga.jpg'))
+    return readFile(path.join(__dirname, 'images', 'taiga.jpg'))
       .then(buffer => nockResponse = nock(IMAGE_HOST).get(IMAGE_NAME).reply(200, buffer))
       .then(() => {
         return request(server.app)
@@ -152,7 +147,7 @@ describe('thumb-server', () => {
         expect(results.width).to.be(THUMBNAIL_WIDTH);
         expect(results.height).to.be(THUMBNAIL_HEIGHT);
       })
-      .then(() => readFileAsync(path.join(IMG_DIR, THUMBNAIL_URL)))
+      .then(() => readFile(path.join(IMG_DIR, THUMBNAIL_URL)))
       .then(buffer => {
         expect(buffer).to.eql(responseBuffer);
       });

@@ -1,6 +1,5 @@
-import bluebird from 'bluebird';
 import expect from 'expect.js';
-import { readFile } from 'fs';
+import { readFile } from 'fs/promises';
 import nock from 'nock';
 import path from 'path';
 import request from 'supertest';
@@ -8,8 +7,6 @@ import sinon from 'sinon';
 
 import { __dirname } from './helpers.js';
 import App from '../src/app.js';
-
-const readFileAsync = bluebird.promisify(readFile);
 
 const IMAGE_BASE64 = 'aHR0cDovL2R4cHJvZy5jb20vY29vbC1waWN0dXJlLmpwZw--';
 const IMAGE_HOST = 'http://dxprog.com';
@@ -28,8 +25,8 @@ describe('thumb-server', () => {
   beforeEach(() => {
     sandbox = sinon.sandbox.create();
     return Promise.all([
-      readFileAsync(path.join(__dirname, '..', 'static', 'broken.png')),
-      readFileAsync(path.join(__dirname, '..', 'static', 'not-found.png'))
+      readFile(path.join(__dirname, '..', 'static', 'broken.png')),
+      readFile(path.join(__dirname, '..', 'static', 'not-found.png'))
     ]).then(([ brokenPng, notFoundPng ]) => {
       brokenImg = brokenPng;
       notFoundImg = notFoundPng;

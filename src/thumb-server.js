@@ -1,15 +1,12 @@
-import bluebird from 'bluebird';
 import express from 'express';
 import http from 'http';
 import path from 'path';
 import url from 'url';
-import { writeFile } from 'fs';
+import { writeFile } from 'fs/promises';
 
 import fetch from './image-fetcher.js';
 import crop from './image-cropper.js';
 import { decodeUrl, encodeUrl } from './url-tools.js';
-
-const writeFileAsync = bluebird.promisify(writeFile);
 
 export default class ThumbServer {
   /**
@@ -139,7 +136,7 @@ export default class ThumbServer {
       const cropBuffer = await crop(fetchBuffer, width, height);
       await Promise.all([
         res.type('jpeg').send(cropBuffer),
-        writeFileAsync(path.join(this.imageStoragePath, `${encodeUrl(imageUrl, width, height)}.jpg`), cropBuffer)
+        writeFile(path.join(this.imageStoragePath, `${encodeUrl(imageUrl, width, height)}.jpg`), cropBuffer)
       ]);
     } catch (err) {
       this.requestFailed(req, res)

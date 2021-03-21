@@ -1,20 +1,15 @@
-import bluebird from 'bluebird';
 import expect from 'expect.js';
-import { readFile } from 'fs';
-import { identify } from 'imagemagick';
+import { readFile } from 'fs/promises';
 import path from 'path';
 
-import { __dirname } from './helpers.js';
+import { __dirname, identifyAsync } from './helpers.js';
 import crop from '../src/image-cropper.js';
-
-const readFileAsync = bluebird.promisify(readFile);
-const identifyAsync = bluebird.promisify(identify);
 
 describe('image-cropper', () => {
   it('should crop the provided image buffer', () => {
     const WIDTH = 300;
     const HEIGHT = 300;
-    return readFileAsync(path.join(__dirname, 'images', 'taiga.jpg'))
+    return readFile(path.join(__dirname, 'images', 'taiga.jpg'))
       .then(buffer => crop(buffer, WIDTH, HEIGHT))
       .then(thumbBuffer => identifyAsync({ data: thumbBuffer }))
       .then(results => {
